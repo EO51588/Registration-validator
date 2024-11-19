@@ -6,92 +6,119 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 function autobind(_, _2, propertyDes) {
-    const origFn = propertyDes.value;
+    const origfn = propertyDes.value;
     return {
         configurable: true,
         get() {
-            return origFn.bind(this);
+            return origfn.bind(this);
         },
     };
 }
-class FormInput {
+class formInput {
     constructor() {
         this.formEl = document.getElementById("userDataForm");
-        this.formEl.addEventListener("submit", this.formSubmitHandler.bind(this));
+        this.formEl.addEventListener("submit", this.formSubmitHandler);
     }
     formSubmitHandler(e) {
         e.preventDefault();
         const formData = new FormData(this.formEl);
-        const inputData = Object.fromEntries([...formData]);
-        this.validateInput(inputData);
+        const inpuData = Object.fromEntries([...formData]);
+        this.validateInput(inpuData);
     }
     validateInput(formData) {
-        const userDataArr = Object.entries(formData); // Entries of the formData object
+        const userDataArr = Object.entries(formData);
         let passValidation = 0;
-        userDataArr.forEach(([key, value]) => {
-            const inputEl = document.querySelector(`[name=${key}]`);
+        userDataArr.forEach(function ([key, val]) {
+            // get current inputEl
+            const x = document.querySelector(`[name=${key}]`);
             let isValid = true;
-            switch (key) {
-                case "full_name":
-                    if (value.trim().split(" ").length < 2) {
-                        isValid = false;
-                        alert("Enter at least two names.");
-                    }
-                    break;
-                case "username":
-                    if (value.length < 5 || value.length > 12 || /\s/.test(value)) {
-                        isValid = false;
-                        alert("Username must be 5-12 characters long and contain no spaces.");
-                    }
-                    break;
-                case "email":
-                    if (!value.includes("@") || /\s/.test(value)) {
-                        isValid = false;
-                        alert("Enter a valid email address without spaces.");
-                    }
-                    break;
-                case "phone":
-                    if (!/^\d{10}$/.test(value)) {
-                        isValid = false;
-                        alert("Phone number must be exactly 10 digits.");
-                    }
-                    break;
-                case "password":
-                    if (value.length < 5 || value.length > 12 || /\s/.test(value)) {
-                        isValid = false;
-                        alert("Password must be 5-12 characters long and contain no spaces.");
-                    }
-                    break;
-                case "confirm_password":
-                    if (value !== formData.password) {
-                        isValid = false;
-                        alert("Passwords do not match.");
-                    }
-                    break;
-                case "gender":
-                    if (!value) {
-                        formData.gender = "rather not say"; // Default gender
-                    }
-                    break;
-                default:
-                    break;
+            // fullname
+            if (isValid && key === "full_name") {
+                // check for two or more names
+                if (!val.trim().split("").includes(" ")) {
+                    isValid = false;
+                    alert("Enter alteast two names");
+                }
             }
-            inputEl.style.color = isValid ? "currentcolor" : "red"; // Set color based on validity
+            // username
+            if (isValid && key === "username") {
+                const [min, max] = [5, 12];
+                // check character length
+                if (!(val.length >= min && val.length <= max)) {
+                    isValid = false;
+                    alert(`Username should have a minimum of ${min === 1 ? min + " character" : min + " characters long"}, and should not exceed ${max} characters`);
+                }
+                // check for whitespace
+                if (val.trim().split("").includes(" ")) {
+                    isValid = false;
+                    alert("Username should not have whitespaces");
+                }
+            }
+            //email
+            if (isValid && key === "email") {
+                // check for @ symbol
+                if (!val.trim().split("").includes("@")) {
+                    isValid = false;
+                    alert("Email should include '@'");
+                }
+                // check for whitespace
+                if (val.trim().split("").includes(" ")) {
+                    isValid = false;
+                    alert("Email should not have whitespaces");
+                }
+            }
+            // phone number
+            if (isValid && key === "phone") {
+                // check if it's a number
+                if (!Number.isFinite(+val)) {
+                    isValid = false;
+                }
+                // check for 10 characters
+                if (!(val.length === 10)) {
+                    isValid = false;
+                }
+                !isValid ? alert("Enter a valid phone number") : "";
+            }
+            // password
+            if (isValid && key === "password") {
+                // check character length
+                const [min, max] = [5, 12];
+                if (!(val.length >= min && val.length <= max)) {
+                    isValid = false;
+                    alert(`Password should have a minimum of ${min === 1 ? min + " character" : min + " characters long"}, and should not exceed ${max} characters`);
+                }
+                // check for whitespace
+                if (val.trim().split("").includes(" ")) {
+                    isValid = false;
+                    alert("Password should not have whitespaces");
+                }
+            }
+            // confirm password
+            if (isValid && key === "confirm_password") {
+                if (!(formData.password === val)) {
+                    isValid = false;
+                    alert("Passwords do not match");
+                }
+            }
+            // check gender
+            if (!formData.gender) {
+                formData.gender = "rather not say";
+            }
+            // highlight invalid inputField
+            x.style.color = isValid ? "currentcolor" : "red";
             isValid ? passValidation++ : passValidation--;
         });
-        if (passValidation === userDataArr.length) {
-            alert("Success!");
-            this.clearForm(userDataArr);
+        if (passValidation === 6) {
+            alert("Success");
+            userDataArr.forEach(function ([key, _]) {
+                // get current inputEl
+                const x = document.querySelector(`[name=${key}]`);
+                x.value = "";
+            });
         }
-    }
-    clearForm(userDataArr) {
-        userDataArr.forEach(([key]) => {
-            const inputEl = document.querySelector(`[name=${key}]`);
-            inputEl.value = ""; // Reset the input values
-        });
     }
 }
 __decorate([
     autobind
-], FormInput.prototype, "formSubmitHandler", null);
-new FormInput();
+], formInput.prototype, "formSubmitHandler", null);
+new formInput();
